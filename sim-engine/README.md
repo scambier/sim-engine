@@ -10,7 +10,7 @@ $ cd ./game
 $ esbuild main.ts --bundle --platform=node --outfile=build/game.js --tree-shaking=false --watch
 
 # Start the engine
-$ RUST_LOG=sim-engine cargo run
+$ RUST_LOG=sim_engine cargo run
 ```
 
 ## Running on the Web
@@ -22,8 +22,8 @@ $ mkdir -p ./target/web/
 $ cp ./index.html ./target/web/
 
 # Release
-$ cargo build --release --package js-game-engine --target wasm32-unknown-unknown --features web
-$ wasm-bindgen --target web --no-typescript --out-dir ./target/web/ ./target/wasm32-unknown-unknown/release/js-game-engine.wasm
+$ cargo build --release --package sim-engine --target wasm32-unknown-unknown --features web
+$ wasm-bindgen --target web --no-typescript --out-dir ./target/web/ ./target/wasm32-unknown-unknown/release/sim-engine.wasm
 ```
 
 ## Benchmarks

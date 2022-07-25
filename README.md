@@ -7,5 +7,5 @@ $ esbuild main.ts --bundle --platform=node --outfile=build/game.js --tree-shakin
 
 # Start the engine
 $ cd ./sim-engine
-$ RUST_LOG=sim-engine cargo run
+$ RUST_LOG=sim_engine cargo run
 ```
