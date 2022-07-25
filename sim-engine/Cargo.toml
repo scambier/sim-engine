@@ -1,0 +1,51 @@
+[package]
+name = "sim-engine"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[features]
+optimize = ["log/release_max_level_warn"]
+web = ["wgpu/webgl"]
+default = ["optimize"]
+
+[dependencies]
+boa_engine = { git = "https://github.com/boa-dev/boa", member = "boa_engine", default-features = false }
+boa_gc = "0.15.0"
+sim-core = { path = "../sim-engine-core" }
+instant = "0.1"
+kira = { version = "0.6.0", default-features = false, features = [
+    "cpal",
+    "wav",
+] }
+lazy_static = "1.4.0"
+log = { version = "0.4" }
+pixels = "0.9"
+rust-embed = "6.4.0"
+winit = "0.26"
+winit_input_helper = "0.12"
+wgpu = "0.12"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+console_error_panic_hook = "0.1"
+console_log = "0.2"
+wasm-bindgen = "0.2.78"
+wasm-bindgen-futures = "0.4"
+web-sys = "0.3"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+env_logger = "0.9"
+pollster = "0.2"
+
+# Enable only a small amount of optimization in debug mode
+[profile.dev]
+opt-level = "z"
+
+# Enable high optimizations for dependencies, but not for our code
+# [profile.dev.package."*"]
+# opt-level = 3
+
+# [profile.release]
+# opt-level = 3 # optimize for speed
+# lto = true
