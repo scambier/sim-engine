@@ -20,7 +20,7 @@ pub fn init_boa() -> BoaContext {
     // Register globals
     setup_api(&mut context);
 
-    // Populate the script definition to the context.
+    // Feed the script definition to the context.
     match context.eval(Scripts::load_game()) {
         Ok(_) => {}
         Err(e) => {
