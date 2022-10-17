@@ -12,10 +12,10 @@ default = ["optimize"]
 
 [dependencies]
 boa_engine = { git = "https://github.com/boa-dev/boa", member = "boa_engine", default-features = false }
-boa_gc = "0.15.0"
+boa_gc = "0.16.0"
 sim-core = { path = "../sim-engine-core" }
 instant = "0.1"
-kira = { version = "0.6.0", default-features = false, features = [
+kira = { version = "0.7.0", default-features = false, features = [
     "cpal",
     "wav",
 ] }
@@ -23,8 +23,8 @@ lazy_static = "1.4.0"
 log = { version = "0.4" }
 pixels = "0.9"
 rust-embed = "6.4.0"
-winit = "0.26"
-winit_input_helper = "0.12"
+winit = "0.27"
+winit_input_helper = "0.13"
 wgpu = "0.12"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
@@ -43,9 +43,9 @@ pollster = "0.2"
 opt-level = "z"
 
 # Enable high optimizations for dependencies, but not for our code
-# [profile.dev.package."*"]
-# opt-level = 3
+[profile.dev.package."*"]
+opt-level = 3
 
-# [profile.release]
-# opt-level = 3 # optimize for speed
-# lto = true
+[profile.release]
+opt-level = 3 # optimize for speed
+lto = true

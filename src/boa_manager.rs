@@ -6,7 +6,8 @@ use boa_gc::Gc;
 use winit::event::VirtualKeyCode;
 
 use crate::{
-    assets::Scripts, audio::play_audio, get_context, keyboard::u32_to_keycode, FONT, HEIGHT, WIDTH,
+    assets::Scripts, audio::play_audio, get_context, keyboard::u32_to_keycode, CANVAS, FONT,
+    HEIGHT, PALETTE, WIDTH,
 };
 
 pub fn init_boa() -> BoaContext {
@@ -107,22 +108,21 @@ fn api_trace(_this: &JsValue, args: &[JsValue], _ctx: &mut BoaContext) -> JsResu
 
 #[inline(always)]
 fn api_print(_this: &JsValue, args: &[JsValue], _ctx: &mut BoaContext) -> JsResult<JsValue> {
-    let context = get_context();
     let text = arg_str(args.get(0));
     let x = arg_i32(args.get(1)).unwrap_or(0);
     let y = arg_i32(args.get(2)).unwrap_or(0);
 
     let color = match arg_i32(args.get(3)) {
-        Some(color) => Some(context.palette.color_idx(color as usize)),
+        Some(color) => Some(PALETTE.color_idx(color as usize)),
         None => None,
     };
 
     let border = match arg_i32(args.get(4)) {
-        Some(border) => Some(context.palette.color_idx(border as usize)),
+        Some(border) => Some(PALETTE.color_idx(border as usize)),
         None => None,
     };
 
-    context.canvas.print(&text, x, y, &FONT, color, border);
+    CANVAS.lock().unwrap().print(&text, x, y, &FONT, color, border);
     return Ok(JsValue::Null);
 }
 
@@ -134,14 +134,13 @@ fn api_get_delta(_this: &JsValue, _args: &[JsValue], _ctx: &mut BoaContext) -> J
 
 #[inline(always)]
 fn api_clear_screen(_this: &JsValue, args: &[JsValue], _ctx: &mut BoaContext) -> JsResult<JsValue> {
-    let context = get_context();
     let color = args
         .get(0)
         .unwrap_or(&JsValue::Integer(15))
         .as_number()
         .unwrap();
-    let color = context.palette.color_idx(color as usize);
-    context.canvas.clear(color);
+    let color = PALETTE.color_idx(color as usize);
+    CANVAS.lock().unwrap().clear(color);
     return Ok(JsValue::null());
 }
 
@@ -153,11 +152,8 @@ fn api_draw_rect(_this: &JsValue, args: &[JsValue], _ctx: &mut BoaContext) -> Js
     let height = arg_i32(args.get(3)).unwrap_or(0);
     let color = arg_i32(args.get(4)).unwrap_or(0);
 
-    let context = get_context();
-    let color = context.palette.color_idx(color as usize);
-    context
-        .canvas
-        .draw_rect(x as i32, y as i32, width as i32, height as i32, color);
+    let color = PALETTE.color_idx(color as usize);
+    CANVAS.lock().unwrap().draw_rect(x as i32, y as i32, width as i32, height as i32, color);
     return Ok(JsValue::null());
 }
 
@@ -173,11 +169,8 @@ fn api_draw_rect_fill(
     let height = arg_i32(args.get(3)).unwrap_or(0);
     let color = arg_i32(args.get(4)).unwrap_or(0);
 
-    let context = get_context();
-    let color = context.palette.color_idx(color as usize);
-    context
-        .canvas
-        .draw_rect_fill(x as i32, y as i32, width as i32, height as i32, color);
+    let color = PALETTE.color_idx(color as usize);
+    CANVAS.lock().unwrap().draw_rect_fill(x as i32, y as i32, width as i32, height as i32, color);
     return Ok(JsValue::null());
 }
 
@@ -188,11 +181,8 @@ fn api_draw_circ(_this: &JsValue, args: &[JsValue], _ctx: &mut BoaContext) -> Js
     let r = arg_i32(args.get(2)).unwrap_or(0);
     let color = arg_i32(args.get(3)).unwrap_or(0);
 
-    let context = get_context();
-    let color = context.palette.color_idx(color as usize);
-    context
-        .canvas
-        .draw_circ(x as i32, y as i32, r as i32, color);
+    let color = PALETTE.color_idx(color as usize);
+    CANVAS.lock().unwrap().draw_circ(x as i32, y as i32, r as i32, color);
     return Ok(JsValue::null());
 }
 
@@ -207,11 +197,8 @@ fn api_draw_circ_fill(
     let r = arg_i32(args.get(2)).unwrap_or(0);
     let color = arg_i32(args.get(3)).unwrap_or(0);
 
-    let context = get_context();
-    let color = context.palette.color_idx(color as usize);
-    context
-        .canvas
-        .draw_circ_fill(x as i32, y as i32, r as i32, color);
+    let color = PALETTE.color_idx(color as usize);
+    CANVAS.lock().unwrap().draw_circ_fill(x as i32, y as i32, r as i32, color);
     return Ok(JsValue::null());
 }
 

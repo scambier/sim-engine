@@ -1,10 +1,11 @@
 use kira::sound::static_sound::{StaticSoundData, StaticSoundSettings};
+use sim_core::get_context_mut;
 use std::io::Cursor;
 
 use crate::{assets::Assets, get_context};
 
 pub fn play_audio(filename: &str) {
-    let manager = &mut get_context().audio_manager;
+    let manager = &mut get_context_mut().audio_manager;
     if let Some(data) = Assets::load_audio(filename) {
         let sound_data =
             match StaticSoundData::from_cursor(Cursor::new(data), StaticSoundSettings::default()) {
