@@ -82,7 +82,7 @@ async fn run() {
             // rune_vm.call(&["draw"], (&rune_game,)).unwrap();
             context.time.update();
             unsafe {
-                let (_, frame, _) = pixels.get_frame().align_to_mut::<u32>();
+                let (_, frame, _) = pixels.get_frame_mut().align_to_mut::<u32>();
                 CANVAS.lock().unwrap().blit(frame);
             }
             if pixels
