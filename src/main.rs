@@ -9,6 +9,8 @@ mod keyboard;
 
 use std::sync::Mutex;
 
+use boa_engine::syntax::ast::node::StatementList;
+use boa_engine::syntax::Parser;
 use lazy_static::lazy_static;
 use log::error;
 use pixels::{Pixels, SurfaceTexture};
@@ -19,7 +21,7 @@ use winit::event::{Event, VirtualKeyCode};
 use winit::event_loop::{ControlFlow, EventLoop};
 
 use crate::assets::Assets;
-use crate::boa_manager::{compile_update, init_boa};
+use crate::boa_manager::init_boa;
 
 const WIDTH: u32 = 128;
 const HEIGHT: u32 = 128;
@@ -51,7 +53,11 @@ async fn run() {
     log::info!("Starting engine");
 
     let mut boa_vm = init_boa();
-    let mut code_block = compile_update(&mut boa_vm);
+    let parsing_result = Parser::new("update()".as_bytes().as_ref())
+        .parse_all(&mut boa_vm)
+        .map_err(|e| e.to_string())
+        .unwrap();
+    let mut code_block = boa_vm.compile(&parsing_result).unwrap();
     let mut show_update_error = true;
 
     match boa_vm.eval("init()") {
@@ -99,7 +105,7 @@ async fn run() {
             if context.input.held_control() && context.input.key_pressed(VirtualKeyCode::R) {
                 // Reload the VM
                 boa_vm = init_boa();
-                code_block = compile_update(&mut boa_vm);
+                code_block = boa_vm.compile(&parsing_result).unwrap();
                 match boa_vm.eval("init()") {
                     Ok(_) => {}
                     Err(_e) => {

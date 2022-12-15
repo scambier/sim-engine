@@ -1,5 +1,8 @@
 use boa_engine::{
-    property::Attribute, syntax::Parser, vm::CodeBlock, Context as BoaContext, JsResult, JsValue,
+    property::Attribute,
+    syntax::{ast::node::StatementList, Parser},
+    vm::CodeBlock,
+    Context as BoaContext, JsResult, JsValue,
 };
 use boa_gc::Gc;
 
@@ -30,16 +33,6 @@ pub fn init_boa() -> BoaContext {
     };
 
     context
-}
-
-pub fn compile_update(mut context: &mut BoaContext) -> Gc<CodeBlock> {
-    let src = "update()".as_bytes();
-    let parsing_result = Parser::new(src.as_ref())
-        .parse_all(&mut context)
-        .map_err(|e| e.to_string());
-    let statement_list = parsing_result.unwrap();
-    let code_block = context.compile(&statement_list).unwrap();
-    code_block
 }
 
 fn arg_i32(v: Option<&JsValue>) -> Option<i32> {
@@ -122,7 +115,10 @@ fn api_print(_this: &JsValue, args: &[JsValue], _ctx: &mut BoaContext) -> JsResu
         None => None,
     };
 
-    CANVAS.lock().unwrap().print(&text, x, y, &FONT, color, border);
+    CANVAS
+        .lock()
+        .unwrap()
+        .print(&text, x, y, &FONT, color, border);
     return Ok(JsValue::Null);
 }
 
@@ -153,7 +149,10 @@ fn api_draw_rect(_this: &JsValue, args: &[JsValue], _ctx: &mut BoaContext) -> Js
     let color = arg_i32(args.get(4)).unwrap_or(0);
 
     let color = PALETTE.color_idx(color as usize);
-    CANVAS.lock().unwrap().draw_rect(x as i32, y as i32, width as i32, height as i32, color);
+    CANVAS
+        .lock()
+        .unwrap()
+        .draw_rect(x as i32, y as i32, width as i32, height as i32, color);
     return Ok(JsValue::null());
 }
 
@@ -170,7 +169,10 @@ fn api_draw_rect_fill(
     let color = arg_i32(args.get(4)).unwrap_or(0);
 
     let color = PALETTE.color_idx(color as usize);
-    CANVAS.lock().unwrap().draw_rect_fill(x as i32, y as i32, width as i32, height as i32, color);
+    CANVAS
+        .lock()
+        .unwrap()
+        .draw_rect_fill(x as i32, y as i32, width as i32, height as i32, color);
     return Ok(JsValue::null());
 }
 
@@ -182,7 +184,10 @@ fn api_draw_circ(_this: &JsValue, args: &[JsValue], _ctx: &mut BoaContext) -> Js
     let color = arg_i32(args.get(3)).unwrap_or(0);
 
     let color = PALETTE.color_idx(color as usize);
-    CANVAS.lock().unwrap().draw_circ(x as i32, y as i32, r as i32, color);
+    CANVAS
+        .lock()
+        .unwrap()
+        .draw_circ(x as i32, y as i32, r as i32, color);
     return Ok(JsValue::null());
 }
 
@@ -198,7 +203,10 @@ fn api_draw_circ_fill(
     let color = arg_i32(args.get(3)).unwrap_or(0);
 
     let color = PALETTE.color_idx(color as usize);
-    CANVAS.lock().unwrap().draw_circ_fill(x as i32, y as i32, r as i32, color);
+    CANVAS
+        .lock()
+        .unwrap()
+        .draw_circ_fill(x as i32, y as i32, r as i32, color);
     return Ok(JsValue::null());
 }
 
