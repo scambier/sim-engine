@@ -112,6 +112,12 @@ async fn run() {
                 pixels.resize_surface(size.width, size.height);
             }
 
+            match runtime.execute_script("update", "update()") {
+                Ok(_) => {}
+                Err(e) => {
+                    error!("Error while executing {:?}", e);
+                }
+            }
             // match boa_vm.execute(code_block.clone()) {
             //     Ok(_) => {}
             //     Err(e) => {
