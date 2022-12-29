@@ -12,7 +12,7 @@ default = ["optimize"]
 
 [dependencies]
 boa_engine = { git = "https://github.com/boa-dev/boa", member = "boa_engine", default-features = false }
-boa_gc = "0.16.0"
+boa_gc = { git = "https://github.com/boa-dev/boa", member = "boa_gc", default-features = false }
 sim-core = { path = "../sim-engine-core" }
 instant = "0.1"
 kira = { version = "0.7.0", default-features = false, features = [
@@ -21,10 +21,10 @@ kira = { version = "0.7.0", default-features = false, features = [
 ] }
 lazy_static = "1.4.0"
 log = { version = "0.4" }
-pixels = "0.10"
+pixels = "0.11.0"
 rust-embed = "6.4.0"
-winit = "0.27"
-winit_input_helper = "0.13"
+winit = "0.27.3"
+winit_input_helper = "0.13.0"
 wgpu = "0.14"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]

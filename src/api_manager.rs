@@ -1,10 +1,7 @@
 use boa_engine::{
     property::Attribute,
-    syntax::{ast::node::StatementList, Parser},
-    vm::CodeBlock,
     Context as BoaContext, JsResult, JsValue,
 };
-use boa_gc::Gc;
 
 use winit::event::VirtualKeyCode;
 
@@ -35,22 +32,13 @@ pub fn init_boa() -> BoaContext {
     context
 }
 
-fn arg_i32(v: Option<&JsValue>) -> Option<i32> {
-    match v {
-        Some(v) => match v {
-            // JsValue::Null => None,
-            // JsValue::Undefined => None,
-            // JsValue::Boolean(_) => None,
-            // JsValue::String(_) => None,
-            JsValue::Rational(v) => Some(*v as i32),
-            JsValue::Integer(v) => Some(*v),
-            JsValue::BigInt(v) => Some(v.to_f64() as i32),
-            // JsValue::Object(_) => None,
-            // JsValue::Symbol(_) => None,
-            _ => None,
-        },
-        None => None,
+fn arg_i32(v: Option<&JsValue>, _ctx: &BoaContext) -> Option<i32> {
+    if let Some(n) = v {
+        if n.is_number() {
+            return Some(n.as_number().unwrap() as i32);
+        }
     }
+    None
 }
 
 fn arg_str(v: Option<&JsValue>) -> String {
@@ -100,17 +88,17 @@ fn api_trace(_this: &JsValue, args: &[JsValue], _ctx: &mut BoaContext) -> JsResu
 }
 
 #[inline(always)]
-fn api_print(_this: &JsValue, args: &[JsValue], _ctx: &mut BoaContext) -> JsResult<JsValue> {
+fn api_print(_this: &JsValue, args: &[JsValue], ctx: &mut BoaContext) -> JsResult<JsValue> {
     let text = arg_str(args.get(0));
-    let x = arg_i32(args.get(1)).unwrap_or(0);
-    let y = arg_i32(args.get(2)).unwrap_or(0);
+    let x = arg_i32(args.get(1), ctx).unwrap_or(0);
+    let y = arg_i32(args.get(2), ctx).unwrap_or(0);
 
-    let color = match arg_i32(args.get(3)) {
+    let color = match arg_i32(args.get(3), ctx) {
         Some(color) => Some(PALETTE.color_idx(color as usize)),
         None => None,
     };
 
-    let border = match arg_i32(args.get(4)) {
+    let border = match arg_i32(args.get(4), ctx) {
         Some(border) => Some(PALETTE.color_idx(border as usize)),
         None => None,
     };
@@ -141,12 +129,12 @@ fn api_clear_screen(_this: &JsValue, args: &[JsValue], _ctx: &mut BoaContext) ->
 }
 
 #[inline(always)]
-fn api_draw_rect(_this: &JsValue, args: &[JsValue], _ctx: &mut BoaContext) -> JsResult<JsValue> {
-    let x = arg_i32(args.get(0)).unwrap_or(0);
-    let y = arg_i32(args.get(1)).unwrap_or(0);
-    let width = arg_i32(args.get(2)).unwrap_or(0);
-    let height = arg_i32(args.get(3)).unwrap_or(0);
-    let color = arg_i32(args.get(4)).unwrap_or(0);
+fn api_draw_rect(_this: &JsValue, args: &[JsValue], ctx: &mut BoaContext) -> JsResult<JsValue> {
+    let x = arg_i32(args.get(0), ctx).unwrap_or(0);
+    let y = arg_i32(args.get(1), ctx).unwrap_or(0);
+    let width = arg_i32(args.get(2), ctx).unwrap_or(0);
+    let height = arg_i32(args.get(3), ctx).unwrap_or(0);
+    let color = arg_i32(args.get(4), ctx).unwrap_or(0);
 
     let color = PALETTE.color_idx(color as usize);
     CANVAS
@@ -160,13 +148,13 @@ fn api_draw_rect(_this: &JsValue, args: &[JsValue], _ctx: &mut BoaContext) -> Js
 fn api_draw_rect_fill(
     _this: &JsValue,
     args: &[JsValue],
-    _ctx: &mut BoaContext,
+    ctx: &mut BoaContext,
 ) -> JsResult<JsValue> {
-    let x = arg_i32(args.get(0)).unwrap_or(0);
-    let y = arg_i32(args.get(1)).unwrap_or(0);
-    let width = arg_i32(args.get(2)).unwrap_or(0);
-    let height = arg_i32(args.get(3)).unwrap_or(0);
-    let color = arg_i32(args.get(4)).unwrap_or(0);
+    let x = arg_i32(args.get(0), ctx).unwrap_or(0);
+    let y = arg_i32(args.get(1), ctx).unwrap_or(0);
+    let width = arg_i32(args.get(2), ctx).unwrap_or(0);
+    let height = arg_i32(args.get(3), ctx).unwrap_or(0);
+    let color = arg_i32(args.get(4), ctx).unwrap_or(0);
 
     let color = PALETTE.color_idx(color as usize);
     CANVAS
@@ -177,11 +165,11 @@ fn api_draw_rect_fill(
 }
 
 #[inline(always)]
-fn api_draw_circ(_this: &JsValue, args: &[JsValue], _ctx: &mut BoaContext) -> JsResult<JsValue> {
-    let x = arg_i32(args.get(0)).unwrap_or(0);
-    let y = arg_i32(args.get(1)).unwrap_or(0);
-    let r = arg_i32(args.get(2)).unwrap_or(0);
-    let color = arg_i32(args.get(3)).unwrap_or(0);
+fn api_draw_circ(_this: &JsValue, args: &[JsValue], ctx: &mut BoaContext) -> JsResult<JsValue> {
+    let x = arg_i32(args.get(0), ctx).unwrap_or(0);
+    let y = arg_i32(args.get(1), ctx).unwrap_or(0);
+    let r = arg_i32(args.get(2), ctx).unwrap_or(0);
+    let color = arg_i32(args.get(3), ctx).unwrap_or(0);
 
     let color = PALETTE.color_idx(color as usize);
     CANVAS
@@ -195,12 +183,12 @@ fn api_draw_circ(_this: &JsValue, args: &[JsValue], _ctx: &mut BoaContext) -> Js
 fn api_draw_circ_fill(
     _this: &JsValue,
     args: &[JsValue],
-    _ctx: &mut BoaContext,
+    ctx: &mut BoaContext,
 ) -> JsResult<JsValue> {
-    let x = arg_i32(args.get(0)).unwrap_or(0);
-    let y = arg_i32(args.get(1)).unwrap_or(0);
-    let r = arg_i32(args.get(2)).unwrap_or(0);
-    let color = arg_i32(args.get(3)).unwrap_or(0);
+    let x = arg_i32(args.get(0), ctx).unwrap_or(0);
+    let y = arg_i32(args.get(1), ctx).unwrap_or(0);
+    let r = arg_i32(args.get(2), ctx).unwrap_or(0);
+    let color = arg_i32(args.get(3), ctx).unwrap_or(0);
 
     let color = PALETTE.color_idx(color as usize);
     CANVAS
@@ -214,10 +202,10 @@ fn api_draw_circ_fill(
 fn api_is_key_just_pressed(
     _this: &JsValue,
     args: &[JsValue],
-    _ctx: &mut BoaContext,
+    ctx: &mut BoaContext,
 ) -> JsResult<JsValue> {
     let context = get_context();
-    match arg_i32(args.get(0)) {
+    match arg_i32(args.get(0), ctx) {
         Some(key_nb) => {
             let key: Option<VirtualKeyCode> = u32_to_keycode(key_nb as u32);
             match key {
@@ -236,9 +224,9 @@ fn api_is_key_just_pressed(
 }
 
 #[inline(always)]
-fn api_is_key_down(_this: &JsValue, args: &[JsValue], _ctx: &mut BoaContext) -> JsResult<JsValue> {
+fn api_is_key_down(_this: &JsValue, args: &[JsValue], ctx: &mut BoaContext) -> JsResult<JsValue> {
     let context = get_context();
-    match arg_i32(args.get(0)) {
+    match arg_i32(args.get(0), ctx) {
         Some(key_nb) => {
             let key: Option<VirtualKeyCode> = u32_to_keycode(key_nb as u32);
             match key {

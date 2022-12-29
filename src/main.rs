@@ -1,27 +1,27 @@
 #![feature(error_reporter)]
+#![feature(let_chains)]
 // #![deny(clippy::all)]
 // #![forbid(unsafe_code)]
 
 mod assets;
 mod audio;
-mod boa_manager;
+mod api_manager;
 mod keyboard;
 
 use std::sync::Mutex;
 
-use boa_engine::syntax::ast::node::StatementList;
 use boa_engine::syntax::Parser;
 use lazy_static::lazy_static;
 use log::error;
 use pixels::{Pixels, SurfaceTexture};
 use sim_core::{
-    get_context, get_context_mut, set_context, window, BitmapFont, Canvas, Context, Palette,
+    get_context, get_context_mut, set_context, window, BitmapFont, Canvas, Palette,
 };
 use winit::event::{Event, VirtualKeyCode};
 use winit::event_loop::{ControlFlow, EventLoop};
 
 use crate::assets::Assets;
-use crate::boa_manager::init_boa;
+use crate::api_manager::init_boa;
 
 const WIDTH: u32 = 128;
 const HEIGHT: u32 = 128;
