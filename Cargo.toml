@@ -13,6 +13,7 @@ default = ["optimize"]
 [dependencies]
 boa_engine = { git = "https://github.com/boa-dev/boa", member = "boa_engine", default-features = false }
 boa_gc = { git = "https://github.com/boa-dev/boa", member = "boa_gc", default-features = false }
+boa_parser = { git = "https://github.com/boa-dev/boa", member = "boa_gc", default-features = false }
 sim-core = { path = "../sim-engine-core" }
 instant = "0.1"
 kira = { version = "0.7.0", default-features = false, features = [

@@ -2584,6 +2584,7 @@ version = "0.1.0"
 dependencies = [
  "boa_engine",
  "boa_gc",
+ "boa_parser",
  "console_error_panic_hook",
  "console_log",
  "env_logger",

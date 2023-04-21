@@ -3,25 +3,24 @@
 // #![deny(clippy::all)]
 // #![forbid(unsafe_code)]
 
+mod api_manager;
 mod assets;
 mod audio;
-mod api_manager;
 mod keyboard;
 
 use std::sync::Mutex;
 
-use boa_engine::syntax::Parser;
+use boa_engine::Source;
+use boa_parser::Parser;
 use lazy_static::lazy_static;
 use log::error;
 use pixels::{Pixels, SurfaceTexture};
-use sim_core::{
-    get_context, get_context_mut, set_context, window, BitmapFont, Canvas, Palette,
-};
+use sim_core::{get_context, get_context_mut, set_context, window, BitmapFont, Canvas, Palette};
 use winit::event::{Event, VirtualKeyCode};
 use winit::event_loop::{ControlFlow, EventLoop};
 
-use crate::assets::Assets;
 use crate::api_manager::init_boa;
+use crate::assets::Assets;
 
 const WIDTH: u32 = 128;
 const HEIGHT: u32 = 128;
@@ -53,14 +52,14 @@ async fn run() {
     log::info!("Starting engine");
 
     let mut boa_vm = init_boa();
-    let parsing_result = Parser::new("update()".as_bytes().as_ref())
-        .parse_all(&mut boa_vm)
+    let parsing_result = Parser::new(&"update()")
+        .parse_script(&mut boa_vm)
         .map_err(|e| e.to_string())
         .unwrap();
-    let mut code_block = boa_vm.compile(&parsing_result).unwrap();
+    let mut code_block = boa_vm.compile_script(&parsing_result).unwrap();
     let mut show_update_error = true;
 
-    match boa_vm.eval("init()") {
+    match boa_vm.eval_script(Source::from_bytes("init()")) {
         Ok(_) => {}
         Err(_e) => {
             // error!("Error while running init(): {:?}", e);
@@ -105,8 +104,8 @@ async fn run() {
             if context.input.held_control() && context.input.key_pressed(VirtualKeyCode::R) {
                 // Reload the VM
                 boa_vm = init_boa();
-                code_block = boa_vm.compile(&parsing_result).unwrap();
-                match boa_vm.eval("init()") {
+                code_block = boa_vm.compile_script(&parsing_result).unwrap();
+                match boa_vm.eval_script(Source::from_bytes("init()")) {
                     Ok(_) => {}
                     Err(_e) => {
                         // log::error!("Error running init(): {:?}", e);
@@ -130,7 +129,7 @@ async fn run() {
                 Ok(_) => {}
                 Err(e) => {
                     if show_update_error {
-                        log::error!("Error while executing {}", e.display());
+                        log::error!("Error while executing {:?}", e);
                         show_update_error = false;
                     }
                 }

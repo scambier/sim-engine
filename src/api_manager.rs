@@ -1,6 +1,6 @@
 use boa_engine::{
     property::Attribute,
-    Context as BoaContext, JsResult, JsValue,
+    Context as BoaContext, JsResult, JsValue, NativeFunction, Source,
 };
 
 use winit::event::VirtualKeyCode;
@@ -10,9 +10,9 @@ use crate::{
     HEIGHT, PALETTE, WIDTH,
 };
 
-pub fn init_boa() -> BoaContext {
+pub fn init_boa() -> BoaContext<'static> {
     let mut context = BoaContext::default();
-    match context.parse(Scripts::load_game()) {
+    match context.parse_script(Source::from_bytes(&Scripts::load_game())) {
         Ok(_) => {}
         Err(e) => {
             log::error!("Error while parsing game script: {}", e);
@@ -22,7 +22,7 @@ pub fn init_boa() -> BoaContext {
     setup_api(&mut context);
 
     // Feed the script definition to the context.
-    match context.eval(Scripts::load_game()) {
+    match context.eval_script(Source::from_bytes(&Scripts::load_game())) {
         Ok(_) => {}
         Err(e) => {
             // log::error!("Error while evaluating script: {:?}", e)
@@ -53,7 +53,7 @@ fn arg_str(v: Option<&JsValue>) -> String {
             }
         }
         JsValue::Object(_) => "[object Object]".to_string(),
-        JsValue::String(v) => v.to_string(),
+        JsValue::String(v) => v.to_std_string().unwrap(),
         JsValue::Rational(v) => v.to_string(),
         JsValue::Integer(v) => v.to_string(),
         JsValue::BigInt(v) => v.to_string(),
@@ -64,20 +64,20 @@ fn arg_str(v: Option<&JsValue>) -> String {
 fn setup_api(boa: &mut BoaContext) {
     boa.register_global_property("WIDTH", WIDTH, Attribute::complement(Attribute::READONLY));
     boa.register_global_property("HEIGHT", HEIGHT, Attribute::complement(Attribute::READONLY));
-    boa.register_global_builtin_function("getDelta", 0, api_get_delta);
-    boa.register_global_builtin_function("trace", 0, api_trace);
+    boa.register_global_builtin_callable("getDelta", 0, NativeFunction::from_fn_ptr(api_get_delta));
+    boa.register_global_builtin_callable("trace", 0, NativeFunction::from_fn_ptr(api_trace));
 
-    boa.register_global_builtin_function("clearScreen", 0, api_clear_screen);
-    boa.register_global_builtin_function("drawRect", 0, api_draw_rect);
-    boa.register_global_builtin_function("drawRectFill", 0, api_draw_rect_fill);
-    boa.register_global_builtin_function("drawCirc", 0, api_draw_circ);
-    boa.register_global_builtin_function("drawCircFill", 0, api_draw_circ_fill);
-    boa.register_global_builtin_function("print", 0, api_print);
+    boa.register_global_builtin_callable("clearScreen", 0, NativeFunction::from_fn_ptr(api_clear_screen));
+    boa.register_global_builtin_callable("drawRect", 0, NativeFunction::from_fn_ptr(api_draw_rect));
+    boa.register_global_builtin_callable("drawRectFill", 0, NativeFunction::from_fn_ptr(api_draw_rect_fill));
+    boa.register_global_builtin_callable("drawCirc", 0, NativeFunction::from_fn_ptr(api_draw_circ));
+    boa.register_global_builtin_callable("drawCircFill", 0, NativeFunction::from_fn_ptr(api_draw_circ_fill));
+    boa.register_global_builtin_callable("print", 0, NativeFunction::from_fn_ptr(api_print));
 
-    boa.register_global_builtin_function("isKeyJustPressed", 0, api_is_key_just_pressed);
-    boa.register_global_builtin_function("isKeyDown", 0, api_is_key_down);
+    boa.register_global_builtin_callable("isKeyJustPressed", 0, NativeFunction::from_fn_ptr(api_is_key_just_pressed));
+    boa.register_global_builtin_callable("isKeyDown", 0, NativeFunction::from_fn_ptr(api_is_key_down));
 
-    boa.register_global_builtin_function("playAudio", 0, api_play_audio);
+    boa.register_global_builtin_callable("playAudio", 0, NativeFunction::from_fn_ptr(api_play_audio));
 }
 
 #[inline(always)]
