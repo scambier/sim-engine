@@ -7,26 +7,16 @@ edition = "2021"
 
 [features]
 optimize = ["log/release_max_level_warn"]
-web = ["wgpu/webgl"]
 default = ["optimize"]
 
 [dependencies]
-# boa_engine = { git = "https://github.com/boa-dev/boa", member = "boa_engine", default-features = false }
-# boa_gc = "0.16.0"
 sim-core = { path = "../sim-engine-core" }
-instant = "0.1"
-kira = { version = "0.7.0", default-features = false, features = [
-    "cpal",
-    "wav",
-] }
 lazy_static = "1.4.0"
 log = { version = "0.4" }
-pixels = "0.10"
 rust-embed = "6.4.0"
 winit = "0.27"
 winit_input_helper = "0.13"
-wgpu = "0.14"
-mlua = { version = "0.8", features = ["lua54", "vendored"] }
+mlua = { version = "0.8", features = ["luau"] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 console_error_panic_hook = "0.1"
