@@ -18,7 +18,7 @@ use sim_core::{
 use winit::event::{Event, VirtualKeyCode};
 use winit::event_loop::{ControlFlow, EventLoop};
 
-use crate::api_manager::init_deno;
+use crate::api_manager::init_interpreter;
 use crate::assets::Assets;
 
 const WIDTH: u32 = 128;
@@ -50,8 +50,9 @@ fn main() {
 async fn run() {
     log::info!("Starting engine");
 
-    let mut runtime = init_deno();
-    runtime.execute_script("update", "update()").unwrap();
+    let mut runtime = init_interpreter().unwrap();
+    // runtime.load("update()").unwrap();
+    runtime.load("trace('hello world')").exec().unwrap();
 
     let event_loop = EventLoop::new();
 
@@ -112,7 +113,7 @@ async fn run() {
                 pixels.resize_surface(size.width, size.height);
             }
 
-            match runtime.execute_script("update", "update()") {
+            match runtime.load("update()").exec() {
                 Ok(_) => {}
                 Err(e) => {
                     error!("Error while executing {:?}", e);

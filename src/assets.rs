@@ -27,7 +27,7 @@ pub struct Scripts;
 
 impl Scripts {
     pub fn load_game() -> String {
-        let file = Self::get("build/game.js").expect("could not load game/game.js");
+        let file = Self::get("main.lua").expect("could not load main.lua");
         String::from_utf8(file.data.into()).unwrap()
     }
 }
