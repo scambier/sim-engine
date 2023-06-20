@@ -39,7 +39,9 @@ impl Game {
 impl Default for Game {
     fn default() -> Self {
         let mut context = rune_modules::default_context().unwrap();
-        context.install(&api_rune::init_rune_module().unwrap()).unwrap();
+        context
+            .install(&api_rune::init_rune_module().unwrap())
+            .unwrap();
         let runtime = Arc::new(context.runtime());
 
         let mut sources = Sources::new();
@@ -47,7 +49,7 @@ impl Default for Game {
             "script",
             r#"
         pub fn update() {
-            trace("Hello from Rune!");
+            printa("Hello from Rune!", 10, 10, (255,255,255));
         }
         "#,
         ));
