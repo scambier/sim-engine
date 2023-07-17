@@ -3,28 +3,30 @@
 
 use std::sync::Arc;
 
-use api_rune::*;
 use assets::*;
+use boa_engine::{Context, Source as BoaSource};
 use rune::termcolor::{ColorChoice, StandardStream};
 use sim_core::clear_screen;
 use statics::*;
 
-use rune::{Diagnostics, Source, Sources, Vm};
+use rune::{Diagnostics, Source as RuneSource, Sources, Vm};
 use sim_core::runner::CoreGame;
 use sim_core::{
     add_camera, get_dt, get_input, get_rng, load_font, load_spritesheet, print, runner::Runner,
     Camera, Color, VirtualKeyCode,
 };
 
-mod api_rune;
 mod assets;
+mod setup_js;
+mod setup_rune;
 mod statics;
 
-pub struct Game {
-    vm: Vm,
+pub struct Game<'a> {
+    rune: Vm,
+    javascript: Context<'a>,
 }
 
-impl Game {
+impl Game<'static> {
     fn update_framerate(&mut self) {
         unsafe {
             FRAMES += 1;
@@ -35,48 +37,21 @@ impl Game {
     }
 }
 
-impl Default for Game {
+impl Default for Game<'static> {
     fn default() -> Self {
-        let mut context = rune_modules::default_context().unwrap();
-        context
-            .install(&api_rune::init_rune_module().unwrap())
-            .unwrap();
-        let runtime = Arc::new(context.runtime());
-
-        let mut sources = Sources::new();
-        sources.insert(Source::new(
-            "script",
-            r#"
-        pub fn update() {
-            printa("Hello from Rune!", 10, 10, (255,255,255));
+        Self {
+            rune: setup_rune::get_vm(),
+            javascript: setup_js::get_context(),
         }
-        "#,
-        ));
-
-        let mut diagnostics = Diagnostics::new();
-
-        let result = rune::prepare(&mut sources)
-            .with_context(&context)
-            .with_diagnostics(&mut diagnostics)
-            .build();
-
-        if !diagnostics.is_empty() {
-            let mut writer = StandardStream::stderr(ColorChoice::Always);
-            diagnostics.emit(&mut writer, &sources).unwrap();
-        }
-
-        let unit = result.unwrap();
-        let vm = Vm::new(runtime, Arc::new(unit));
-
-        Self { vm }
     }
 }
 
-impl CoreGame for Game {
+impl CoreGame for Game<'static> {
     fn update(&mut self) {
         // Pre-update
         self.update_framerate();
-        self.vm.call(&["update"], ()).unwrap();
+        // self.rune.call(&["update"], ()).unwrap();
+        self.javascript.eval(BoaSource::from_bytes("update()"));
 
         unsafe {
             print(
@@ -114,7 +89,7 @@ fn main() {
 }
 
 async fn start_main_loop() {
-    let mut runner = Runner::new(WIDTH, HEIGHT, WINDOW_SCALE, "Porklike".to_string());
+    let mut runner = Runner::new(WIDTH, HEIGHT, WINDOW_SCALE, "Sim Engine".to_string());
     // runner.set_scanlines(true);
 
     load_font(0, Assets::load_font("dinofive_font.png", 5, 6, 1, 1));
