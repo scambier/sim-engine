@@ -1,6 +1,5 @@
 #![feature(lazy_cell)]
 #![feature(let_chains)]
-#![feature(drain_filter)]
 
 use std::sync::Arc;
 
