@@ -1,13 +1,12 @@
 use boa_engine::{
     native_function::NativeFunctionPointer, Context, JsObject, JsValue, NativeFunction, Source,
 };
-use boa_runtime::Console;
 use sim_core::{print, Color};
 
-pub fn get_context() -> Context<'static> {
+pub fn get_context() -> Context {
     let mut context = Context::default();
     let _ = context.register_global_callable(
-        "print",
+        "print".into(),
         0,
         NativeFunction::from_copy_closure(move |this, args, ctx| {
             log::debug!("print: {:?}", args);

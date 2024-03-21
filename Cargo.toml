@@ -10,30 +10,13 @@ optimize = ["log/release_max_level_warn"]
 default = ["optimize"]
 
 [dependencies]
-ahash = "0.8.2"
-bitflags = "1.3.2"
-log = "0.4.17"
-rust-embed = "6.4.2"
-rustc-hash = "1.1.0"
+bitflags = "1.3"
+log = "0.4"
+rust-embed = "8.0"
+rustc-hash = "1.1"
 sim-core = { path = "../sim-engine-core" }
-wgpu = "0.14.2"
-instant = "0.1.12"
-rune = "0.12.4"
-rune-modules = "0.12.4"
-boa_engine = "0.17.0"
-boa_gc = "0.17.0"
-boa_runtime = "0.17.0"
-
-[target.'cfg(target_arch = "wasm32")'.dependencies]
-console_error_panic_hook = "0.1"
-console_log = "0.2"
-wasm-bindgen = "0.2.78"
-wasm-bindgen-futures = "0.4"
-web-sys = "0.3"
-
-[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-env_logger = "0.9"
-pollster = "0.2"
+instant = "0.1"
+boa_engine = "0.18.0"
 
 # Enable only a small amount of optimization in debug mode
 [profile.dev]
