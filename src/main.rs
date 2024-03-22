@@ -2,14 +2,14 @@
 #![feature(let_chains)]
 
 use assets::*;
-use boa_engine::{Context as BoaContext, JsResult, Source as BoaSource};
+use boa_engine::{Context as BoaContext, Source as BoaSource};
 use sim_core::{
-    add_camera, context::Context, get_dt, load_font, print, App, Camera, Color, CoreGame, Runner,
+    add_camera, context::Context, get_dt, load_font, print, App, Camera, Color, CoreGame,
 };
 use statics::*;
 
 mod assets;
-mod setup_js;
+mod api_manager_js;
 mod statics;
 
 pub struct Game {
@@ -30,7 +30,7 @@ impl Game {
 impl Default for Game {
     fn default() -> Self {
         Self {
-            javascript: setup_js::get_context(),
+            javascript: api_manager_js::get_context(),
         }
     }
 }
