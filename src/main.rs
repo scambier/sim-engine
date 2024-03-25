@@ -38,21 +38,10 @@ impl Default for Game {
 impl CoreGame for Game {
     fn startup(&mut self) {}
 
-    fn update(&mut self, ctx: &Context) {
+    fn update(&mut self, _ctx: &Context) {
         // Pre-update
         self.update_framerate();
-        // self.rune.call(&["update"], ()).unwrap();
         self.javascript.eval(BoaSource::from_bytes("update()"));
-
-        unsafe {
-            print(
-                format!("FPS: {}", FRAMERATE).as_str(),
-                450,
-                0,
-                Some(Color::from_hex(0xffffff)),
-                Some(Color::from_hex(0x000000)),
-            );
-        }
     }
 }
 
